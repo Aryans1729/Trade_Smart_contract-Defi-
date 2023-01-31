@@ -1,0 +1,49 @@
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+
+contract Codedamn{
+
+    address payable public owner;
+    address public buyer;
+    uint public price;
+
+mapping(address => uint) public balances;
+
+event Transfer(address owner , address spender , uint amount); 
+    constructor(){
+        owner = payable(msg.sender);
+    }
+
+    function setPrice(uint _price) public  {
+        require(msg.sender == owner,"You are not the owner");
+        price = _price;
+    }
+    function pay() external payable{
+        require(msg.value == price, "You dont have enough amount to buy");
+        uint contractBalance = address(this).balance;
+        contractBalance += msg.value;
+        buyer = msg.sender;
+
+        
+    }
+
+    function getBalance(address _owner) public view returns(uint balance) {
+        require(owner == msg.sender,"You cant get the Owner");
+        return balances[_owner];
+
+    }
+    function withdraw(address _to , uint tokens) public returns(bool success) {
+        require(owner == msg.sender,"You cannot access this feature");
+        balances[msg.sender] -= tokens;
+        balances[_to] += tokens;
+
+        emit Transfer(msg.sender , _to , tokens);
+        return true;
+
+        
+
+
+    }
+
+}
